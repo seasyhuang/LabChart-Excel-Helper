@@ -4,7 +4,7 @@ import sys
 from sys import argv
 
 def average(df):
-    print()
+    print("average method is not done yet")
 
 def selected_average(df, start_cmt, end_cmt):
     print("\nExtracting average:\nFrom:\t" + start_cmt + " to " + end_cmt)
@@ -108,14 +108,15 @@ def minute_averages(df):
 
 def selected_min_averages(df, start_cmt, end_cmt):
 
-    print()
+    print("selected min averages still being done")
 
-def get_comments(df):
+def get_comments(df, show_comments):
     cmts = df[df.columns[-1]].unique()
 
-    for i, cmt in enumerate(cmts):
-        print(i, end="\t")
-        print(cmt)
+    if show_comments:
+        for i, cmt in enumerate(cmts):
+            print(i, end="\t")
+            print(cmt)
 
     return(cmts)
 
@@ -131,12 +132,45 @@ def main():
 
     print('Columns:' , df.columns)
 
-    cmts = get_comments(df)
-    # add: prompt user for comment
-    selected_average(df, cmts[22], cmts[35])
-    # minute_averages(df)
+    try:
+        if sys.argv[1] == "c":
+            cmts = get_comments(df, True)
+            exit(1)
 
-    pass
+        cmts = get_comments(df, False)
+
+        if sys.argv[1] == "a":
+            average(df)
+
+        if sys.argv[1] == "sa":
+            try:
+                start_cmt = sys.argv[2]
+                endcmt = sys.argv[3]
+            except:
+                print("No argument provided for start and/or end comment")
+                exit(1)
+            selected_average(df, start_cmt, end_cmt)
+
+        if sys.argv[1] == "m":
+            minute_averages(df)
+
+        if sys.argv[1] == "sm":
+            try:
+                start_cmt = sys.argv[2]
+                endcmt = sys.argv[3]
+            except:
+                print("No argument provided for start and/or end comment")
+                exit(1)
+            selected_min_averages(df, start_cmt, end_cmt)
+
+    except:
+        print('''Valid arguments:
+        c - get comments
+        a - returns averages of entire range
+        sa - returns averages of selected range (sa, start index, end index)
+        m - returns average per minute of entire range
+        sm - returns averages per minute of selected range (sm, start index, end index)\n''')
+        pass
 
 
 if __name__ == '__main__':
