@@ -3,8 +3,27 @@ import pandas as pd
 import sys
 from sys import argv
 
-def average(df):
-    print("average method is not done yet")
+def average(df, sheetname):
+    print("\nExtracting average from sheet: ", sheetname)
+
+    stats = []
+    stats.append(df.columns[3:-1])                          # remove sel start, end, duration // and remove cmt text
+
+    help = []
+    for i in range(len(stats[0])):
+        try:
+            f = df[stats[0][i]].mean()    # stats[0][i] == "Resp Rate" --> "HR"
+        except:
+            f = df[stats[0][i]][df[stats[0][i]]!=" "].mean()    # fuck whitespace
+        help.append(f)
+    stats.append(help)
+
+    for s in stats:
+        print(s)
+
+    df2 = pd.DataFrame(stats)
+    df2.to_excel("../output/" + sheetname + "_av" + ".xlsx")
+
 
 def selected_average(df, start_cmt, end_cmt):
     print("\nExtracting average:\nFrom:\t" + start_cmt + " to " + end_cmt)
@@ -115,15 +134,13 @@ def selected_min_averages(df, start_cmt, end_cmt):
     start_idx = (df[df.columns[-1]].values == start_cmt).argmax()
     end_idx = (df[df.columns[-1]].values == end_cmt).argmax()
 
-    # change df size with indices
-    df = df[start_idx:end_idx+1].copy()
-
-    h = 0
+    h = start_idx
     t_start = df[df.columns[0]][start_idx]      # df.columns[0] should be sel start
     int_t = int(t_start)
 
+    while(h + 60 < end_idx):
+    # while(h < end_idx):                       # will give one minute past end ind
 
-    while(True):
         try:
             t = []
 
@@ -145,8 +162,6 @@ def selected_min_averages(df, start_cmt, end_cmt):
             t.append(i)
             print(i)
 
-            # first minute
-            # print(df[h:i])
             h = i
             int_t = next_t
             averages.append(t)
@@ -210,8 +225,9 @@ def view(df, s, e):
 def main():
 
     path = "../SB8_data_resp.xlsx"
-    # df = pd.read_excel(path, sheet_name="RESPpd")
-    df = pd.read_excel(path, sheet_name="rest of data")
+    sheetname = "rest of data"
+    df = pd.read_excel(path, sheet_name=sheetname)
+    # df = pd.read_excel(path, sheet_name="rest of data")
 
     df=df.dropna(axis=1,how='all')
 
@@ -232,7 +248,7 @@ def main():
             exit(1)
 
         if sys.argv[1] == "a":
-            average(df)
+            average(df, sheetname)
 
         if sys.argv[1] == "sa":
             try:
