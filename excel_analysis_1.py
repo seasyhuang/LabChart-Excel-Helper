@@ -11,10 +11,16 @@ def average(df, sheetname):
 
     help = []
     for i in range(len(stats[0])):
+        # try:
+        #     f = df[stats[0][i]].mean()    # stats[0][i] == "Resp Rate" --> "HR"
+        # except:
+        #     f = df[stats[0][i]][df[stats[0][i]]!=" "].mean()    # fuck whitespace
         try:
-            f = df[stats[0][i]].mean()    # stats[0][i] == "Resp Rate" --> "HR"
+            col = df[stats[0][i]].dropna()    # stats[0][i] == "Resp Rate" --> "HR"
+            f = rounded_mean(col)
         except:
-            f = df[stats[0][i]][df[stats[0][i]]!=" "].mean()    # fuck whitespace
+            col = df[stats[0][i]][df[stats[0][i]]!=" "].dropna()    # fuck whitespace
+            f = rounded_mean(col)
         help.append(f)
     stats.append(help)
 
@@ -22,8 +28,7 @@ def average(df, sheetname):
         print(s)
 
     df2 = pd.DataFrame(stats)
-    df2.to_excel("../output/" + sheetname + "_av" + ".xlsx")
-
+    df2.to_excel("../output/" + sheetname + "_average" + ".xlsx")
 
 def selected_average(df, start_cmt, end_cmt):
     print("\nExtracting average:\nFrom:\t" + start_cmt + " to " + end_cmt)
@@ -40,7 +45,8 @@ def selected_average(df, start_cmt, end_cmt):
 
     help = []
     for i in range(len(stats[0])):
-        f = sel_df[stats[0][i]].mean()
+        col = sel_df[stats[0][i]].dropna()
+        f = rounded_mean(col)
         help.append(f)
     stats.append(help)
 
@@ -49,7 +55,6 @@ def selected_average(df, start_cmt, end_cmt):
 
     df2 = pd.DataFrame(stats)
     df2.to_excel("../output/" + start_cmt + "_" + end_cmt + ".xlsx")
-
 
 def minute_averages(df):
     averages = []
@@ -111,7 +116,8 @@ def minute_averages(df):
             next = int(averages[d][3])
 
             for i in range(len(stats[0])):
-                f = df[first:next][stats[0][i]].mean()
+                col = df[first:next][stats[0][i]].dropna()
+                f = rounded_mean(col)
                 help.append(f)
             stats.append(help)
         except:
@@ -176,8 +182,6 @@ def selected_min_averages(df, start_cmt, end_cmt):
     for col in averages:
         print(col)
 
-    # col2 = ['Resp Rate', 'MAP', 'SBP', 'DBP', 'HR']   == df.columns[3:-1]
-
     stats = []
     stats.append(df.columns[3:-1])
 
@@ -190,7 +194,8 @@ def selected_min_averages(df, start_cmt, end_cmt):
             next = int(averages[d][3])
 
             for i in range(len(stats[0])):
-                f = df[first:next][stats[0][i]].mean()
+                col = df[first:next][stats[0][i]].dropna()
+                f = rounded_mean(col)
                 help.append(f)
             stats.append(help)
         except:
@@ -203,6 +208,14 @@ def selected_min_averages(df, start_cmt, end_cmt):
     df2 = pd.DataFrame(stats)
     df_concat = pd.concat([df1, df2], axis=1)
     df_concat.to_excel("../output/" + start_cmt + "_" + end_cmt + "_min" + ".xlsx")
+
+def rounded_mean(col):
+    # print(col.name)
+    if col.name == 'Resp Rate':
+        rmean = col.mean().astype(np.double).round(1)
+    if col.name == 'MAP' or col.name == 'SBP' or col.name == 'DBP' or col.name == 'HR':
+        rmean = col.mean().astype(np.double).round(0).astype(np.int)                     # convert to double then round to nearest int, then truncate .0 with np.int
+    return rmean
 
 def get_comments(df, show_comments):
     cmts = df[df.columns[-1]].unique()
@@ -226,8 +239,8 @@ def main():
 
     path = "../SB8_data_resp.xlsx"
     sheetname = "rest of data"
+    # sheetname = "RESPprotpd"
     df = pd.read_excel(path, sheet_name=sheetname)
-    # df = pd.read_excel(path, sheet_name="rest of data")
 
     df=df.dropna(axis=1,how='all')
 
@@ -277,7 +290,8 @@ def main():
             a - returns averages of entire range
             sa - returns averages of selected range (sa, start index, end index)
             m - returns average per minute of entire range
-            sm - returns averages per minute of selected range (sm, start index, end index)\n''')
+            sm - returns averages per minute of selected range (sm, start index, end index)
+            * note that Resp Rate is rounded to 1 decimal place and MAP, SBP, DBP, and HR are integers \n''')
             exit(0)
 
     except Exception as e:
