@@ -1,5 +1,5 @@
 # LabChart-Excel-Helper
-for data analysis
+for SB data analysis
 
 Cleaning excel from LabChart Datapad:
 - Copy to excel sheet from datapad 
@@ -17,3 +17,7 @@ Use:
 - change the path to excel INSIDE python file (bad practice I know)
 
 > excel_analysis_1.py [options]
+
+Output:
+- outputs to excel file in ../output
+- output file name changes based on [option]
