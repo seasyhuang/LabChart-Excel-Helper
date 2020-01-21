@@ -252,7 +252,7 @@ def view(df, s, e):
 def main():
 
     # path = "../Pilot_EJ_edit_EJ.xlsx"
-    path = "../Pilot_4_2019-11_08_JY_edit_EJ.xlsx"
+    path = "../Pilot_SB_FH_12-17-2020_clean.xlsx"
     sheetname = "Sheet1"
     # sheetname = "RESPprotpd"
     df = pd.read_excel(path)#, sheet_name=sheetname)
@@ -286,9 +286,19 @@ def main():
                 print(e)
             exit(1)
 
-        bool_round = input("Round values (Resp Rate --> to 1 decimal place; MAP, SBP, DBP, HR --> integer)? [Y/N] \t")
-        if bool_round.lower() == 'y':   bool_round = True
-        else:                           bool_round = False
+        if sys.argv[1] == "-h":
+            print('''Valid arguments:
+            c - get comments
+            a - returns averages of entire range
+            sa - returns averages of selected range [sa, comment start index, end index]
+            m - returns average per minute of entire range
+            sm - returns averages per minute of selected range [sm, comment start index, end index]\n''')
+            exit(0)
+
+        # bool_round = input("Round values (Resp Rate --> to 1 decimal place; MAP, SBP, DBP, HR --> integer)? [Y/N] \t")
+        # if bool_round.lower() == 'y':   bool_round = True
+        # else:                           bool_round = False
+        bool_round = False
 
         if sys.argv[1] == "-a":
             average(df, sheetname, bool_round)
@@ -314,14 +324,6 @@ def main():
                 exit(1)
             selected_min_averages(df, start_cmt, end_cmt, bool_round)
 
-        if sys.argv[1] == "-h":
-            print('''Valid arguments:
-            c - get comments
-            a - returns averages of entire range
-            sa - returns averages of selected range [sa, comment start index, end index]
-            m - returns average per minute of entire range
-            sm - returns averages per minute of selected range [sm, comment start index, end index]\n''')
-            exit(0)
 
     except Exception as e:
         print("Error:", e)
