@@ -30,26 +30,9 @@ def selected_average(df, start_cmt, end_cmt, path):
         print(s)
 
     df2 = pd.DataFrame(stats)
-    # Printing to excel:
-    # df2.to_excel("../output/" + start_cmt + "_" + end_cmt + ".xlsx")
+    save(df2, start_cmt, end_cmt, path)
 
-    # Creating/appending to csv
-    df2.insert(0, '', start_cmt + " " + end_cmt)        # inserts name of section to start of df
-
-    # if file doesn't exist, add the header then save
-    output = Path(path + "_output.csv")
-    if output.is_file():
-        print(output, "exists, appending to end of file")
-        df2.iloc[[1]].to_csv(output, mode = 'a', index = False, header = None)
-    # otherwise, append to end of file
-    else:
-        print("Creating new file: ", output)
-        df2.to_csv(output, mode = 'a', index = False, header = None)
-
-def save():
-    print()
-
-def selected_min_averages(df, start_cmt, end_cmt):
+def selected_min_averages(df, start_cmt, end_cmt, path):
 
     averages = []
     averages.append(['s_time', 'e_time', 's_idx', 'e_idx'])
@@ -130,8 +113,25 @@ def selected_min_averages(df, start_cmt, end_cmt):
 
     df1 = pd.DataFrame(averages)
     df2 = pd.DataFrame(stats)
-    df_concat = pd.concat([df1, df2], axis=1)
-    df_concat.to_excel("../output/" + start_cmt + "_" + end_cmt + "_min" + ".xlsx")
+    df_concat = pd.concat([df2, df1], axis=1)
+    save(df_concat, start_cmt, end_cmt, path)
+    # df_concat.to_excel("../output/" + start_cmt + "_" + end_cmt + "_min" + ".xlsx")
+
+def save(df2, start_cmt, end_cmt, path):
+    ### Printing to excel:
+    # df2.to_excel("../output/" + start_cmt + "_" + end_cmt + ".xlsx")
+
+    ### Creating/appending to csv
+    output = Path(path + "_output.csv")
+    df2.insert(0, '', start_cmt + " - " + end_cmt)        # inserts name of section to start of df
+    # If file doesn't exist, add the header then save
+    if not output.is_file():
+        print("Creating new file: ", output)
+        df2.to_csv(output, mode = 'a', index = False, header = None)
+    # otherwise, append to end of file
+    else:
+        print(output, "exists, appending to end of file")
+        df2.iloc[1:].to_csv(output, mode = 'a', index = False, header = None)
 
 def get_comments(df, show_comments):
     cmts = df[df.columns[-1]].unique()
@@ -155,7 +155,7 @@ def main():
     try:
         path = sys.argv[1]
         print("Analysing:".upper(), path)
-        sheetname = "Sheet1"
+        # df = pd.read_excel(path)
         df = pd.read_excel(path, sheet_name="Sheet2")
         path = os.path.splitext(path)[0]
     except:
@@ -213,7 +213,7 @@ def main():
             except:
                 print("No argument provided for start and/or end comment")
                 exit(1)
-            selected_min_averages(df, start_cmt, end_cmt)
+            selected_min_averages(df, start_cmt, end_cmt, path)
 
 
     except Exception as e:

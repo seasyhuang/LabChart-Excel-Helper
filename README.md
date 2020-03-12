@@ -1,7 +1,7 @@
 # LabChart-Excel-Helper
 for SB data analysis
 
-Excel Sheet Setup:
+### Excel Sheet Setup:
 - Get data from LabChart datapad - select all data, and select data points by event marker (BP)
 - Copy to excel sheet from datapad
 - Delete units (s, mean, etc)
@@ -13,21 +13,18 @@ Excel Sheet Setup:
 - Change path to excel file and sheetname in main (inside excel_analysis_1.py)
 - *if the time ever restarts,* separate the new times into new sheets
 
-General Usage:
+### General Usage:
 - In terminal, go to the folder (`cd`) containing `excel_analysis.py`
 - Run the script using `python excel_analysis.py [excel file name] [option]`
 - using the `-h` option will show list of accepted arguments
 - example: `python excel_analysis.py SB_test_file.xlsx -h`
 
-Example Usage:
+### Example Usage:
 - Start by getting a numbered list of comments: `python excel_analysis.py SB_test_file.xlsx -c`
 
-
-
-- *** potential error in SM: can't find the associated time (start time) because it was deleted (CAL wave) --> need to manually fix this in excel input
-
-> excel_analysis_1.py [options]
-
-Output:
+### Output:
 - outputs to excel file in ../output
-- output file name changes based on [option]
+- output file name changes based on `[option]`
+
+### Etc
+- *** potential error in SM: can't find the associated time (start time) because it was deleted (CAL wave) --> need to manually fix this in excel input
