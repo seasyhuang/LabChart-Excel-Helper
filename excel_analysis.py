@@ -21,6 +21,9 @@ def selected_average(df, start_cmt, end_cmt, path):
 
     help = []
     for i in range(len(stats[0])):
+        # Ignoring CAL comments (TODO)
+        # comment = sel_df.iloc[i, -1]
+        # if (comment.lower()=="cal"):
         col = sel_df[stats[0][i]].dropna()
         f = col.mean()
         help.append(f)
@@ -47,6 +50,10 @@ def selected_min_averages(df, start_cmt, end_cmt, path):
     int_t = int(t_start)                        # time (in s) of start comment
     int_te = int(t_end)                         # time (in s) of end comment
 
+    # Error handling: section is shorter than 1 minute
+    if (int_t + 60 > int_te+1):
+        print("*******************************\n*******************************\nSection is shorter than 1 minute: please use -sa (selected average) option instead of -sm.\n*******************************\n*******************************")
+
     # gets the times and indices associated with comment
     while(int_t + 60 <= int_te+1):
         try:
@@ -66,13 +73,19 @@ def selected_min_averages(df, start_cmt, end_cmt, path):
             str_t = df['Sel Start'].apply(str)
             idx = df[str_t.astype(str).str.startswith(inext_t)]
 
-            i = idx.index[0]
-            t.append(i)
-            print(i)
+            # If the time (s) doesn't exist in the excel file, repeat the loop but one second back
+            try:
+                i = idx.index[0]
+                t.append(i)
+                print(i)
 
-            h = i
-            int_t = next_t
-            averages.append(t)
+                h = i
+                int_t = next_t
+                averages.append(t)
+
+            except:
+                int_t = int_t - 1
+                pass
 
         except:
             # includes the last section (non-full minute)
@@ -81,7 +94,7 @@ def selected_min_averages(df, start_cmt, end_cmt, path):
             break
 
     print()
-    print(int_te)
+    print("Start Time (s):", int_t, "\t||\tEnd Time (s):", int_te)
     print('############################')
 
     # print(averages)
@@ -123,12 +136,13 @@ def save(df2, start_cmt, end_cmt, path):
 
     ### Creating/appending to csv
     output = Path(path + "_output.csv")
-    df2.insert(0, '', start_cmt + " - " + end_cmt)        # inserts name of section to start of df
+    df2.insert(0, '', start_cmt + " - " + end_cmt)      # Inserts name of section to start of df
+    df2.iloc[0,0] = ""                                # Erase duplicate
     # If file doesn't exist, add the header then save
     if not output.is_file():
         print("Creating new file: ", output)
         df2.to_csv(output, mode = 'a', index = False, header = None)
-    # otherwise, append to end of file
+    # Otherwise, append to end of file
     else:
         print(output, "exists, appending to end of file")
         df2.iloc[1:].to_csv(output, mode = 'a', index = False, header = None)
@@ -155,8 +169,8 @@ def main():
     try:
         path = sys.argv[1]
         print("Analysing:".upper(), path)
-        # df = pd.read_excel(path)
-        df = pd.read_excel(path, sheet_name="Sheet2")
+        df = pd.read_excel(path)
+        # df = pd.read_excel(path, sheet_name="Sheet2")     # TESTING
         path = os.path.splitext(path)[0]
     except:
         print("First argument must be valid path to excel file.")
