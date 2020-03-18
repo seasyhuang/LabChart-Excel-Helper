@@ -14,8 +14,8 @@ for SB data analysis
 - *if the time ever restarts,* separate the new times into new sheets
 
 ### General Usage:
-- In terminal, go to the folder (`cd`) containing `excel_analysis.py`
-- Run the script using `python excel_analysis.py [excel file name] [option]`
+- In terminal, go to the folder (`cd`) containing `excel_analysis.py` (example: `cd Desktop/`)
+- Run the script: `python excel_analysis.py [excel file name] [option]`
 - using the `-h` option will show list of accepted arguments
 - example: `python excel_analysis.py SB_test_file.xlsx -h`
 
